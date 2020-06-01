@@ -46,7 +46,7 @@ Cloud9 is fully managed IDE and provides the AWS SDK, AWS Cli and has Docker pre
 - In the AWS Console select "Services" and type "Cloud9"
 - Click "Open IDE" on your instance. This will open a new window in your Browser and show the Cloud9 GUI
 
-![Open Environment](images/cloud9_environments.png)
+![Open Environment](images/cloud9_environments.png?v=4&s=10) 
  
 ## Clone Repository ##
 - Select the terminal window and make sure you're in the folling directory:
