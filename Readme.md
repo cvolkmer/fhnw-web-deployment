@@ -22,16 +22,22 @@ Services deployed by the CloudFormation template:
 - On the right side in the CloudFormation window, click on "Create stack" and select "With new resources (standard)"
 - Under "Specify template" select "Upload a template file" and click "Choose file"
 - Select the file "environment_setup.yaml" in the "infrastructure" directory of this repository and click "Next"
-![New Stack](https://github.com/cvolkmer/fhnw-web-deployment/images/cf_new_stack.png)
+
+
+![New Stack](images/cf_new_stack.png)
 
 - Use "roomreservation" as "Stack name"
 - Leave the default values for the other parameters
-![Stack Details](https://github.com/cvolkmer/fhnw-web-deployment/images/cf_stack_details.png)
+
+
+![Stack Details](images/cf_stack_details.png)
 
 - Provide and note down a DBUsername and DBPassword parameter and click "Next"
 - On the "Configure Stack options" page scroll down and click "Next"
 - On the next page scroll down, select the checkbox under "Capabilities" and click "Create stack"
-![Create Stack](https://github.com/cvolkmer/fhnw-web-deployment/images/cf_new_stack.png)
+
+
+![Create Stack](images/cf_new_stack.png)
 
 - The Stack will be deployed automatically. This takes about 10 minutes. You can follow the creation process under "Events" and see the "Resources" deployed
 
@@ -39,6 +45,8 @@ Services deployed by the CloudFormation template:
 Cloud9 is fully managed IDE and provides the AWS SDK, AWS Cli and has Docker pre-installed. 
 - In the AWS Console select "Services" and type "Cloud9"
 - Click "Open IDE" on your instance. This will open a new window in your Browser and show the Cloud9 GUI
+
+![Open Environment](images/cloud9_environments.png)
  
 **Clone Repository**
 - Select the terminal window and make sure you're in the folling directory:
@@ -54,8 +62,13 @@ git clone https://github.com/cvolkmer/fhnw-web-deployment.git
 - Open a seaparate Browser tab (clone an existing one)
 - In the AWS Console select "Services" and type "Elastic Container Registry"
 - Click on the existing registry and open it
+
+![Open ECR registry](images/ecr_repositories.png)
+
 - Make sure there is no image in the registry
 - Click on "View push commands" to get the instructions needed for the next steps.
+
+![ECR push commands](images/ecr_push_commands.png)
 
 **Build your image**
 - Go back to your Cloud9 browser window
