@@ -314,7 +314,7 @@ Resources:
   MyContainerRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: roomreservationtest2
+      RepositoryName: roomreservation
 
   ###############################################################
   ### Cloud9
