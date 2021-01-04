@@ -106,6 +106,7 @@ cd fhnw-web-deployment/container/
 ## Run the task ##
 
 
+## Create a service ##
 
 
 ## Important to remember##
