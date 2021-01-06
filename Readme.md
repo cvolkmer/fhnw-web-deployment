@@ -1,29 +1,31 @@
 # Introduction #
 
-This workshop is part of the WebDeployment lecture and considered a hands-on practical example, how deploy a sample Java application based on Amazon ECS Fargate container solution. It consists of 2 Lab sections and you will be guided through the all the steps needed.
+This workshop is part of the WebDeployment lecture and considered a hands-on practical example on how deploy a sample Java application based on Amazon ECS Fargate container solution. It consists of 2 Lab sections and you will be guided through the all the steps needed.
 # Lab 1 #
 
-This is the basic hands-on lab which should be run as part of the lecture. The target architecture looks like this.
+This is a basic hands-on lab which should be run as part of the lecture. First, you will login and familiarize yourself with the AWS Console and the environment. You will launch a template to automatically deploy and provision the base infrastructure needed for the entire workshop. All sources are stored in this repository which will be cloned to a AWS Cloud9 instance, a web based IDE. You will build a Docker image containing the sample Java application and push it to the Amazon ECR container registry. The image will be deployed and executed on Amazon ECS. You will run through all steps needed to deploy this single Docker image.
+
+The architecture looks like this:
 
 ![Lab 1 Architecture](images/architecture_lab1.png)
 ## Login to the AWS Console ##
 
-You will need access to an AWS Account in order to conduct this lab. Either you're having an existing one, or you will be given access to an AWS environment.
+You will need access to an AWS Account in order to conduct this lab. Either you're having your own one, or you will be given access to an AWS environment.
 
 ## Prepare the environment ##
 
-We will be using a couple of AWS services for this lab. The base infrastructure setup is available as a CloudFormation template. If you are interested in what is deployed - the template is stored in this repository under "Infrastructure".
+We will be using a couple of AWS services for this lab. The base infrastructure setup is available as a CloudFormation template. If you want to learn more what and how it is deployed - the template "environment_setup.yaml" is stored in this repository under "Infrastructure".
 
 Services deployed by the AWS CloudFormation template:
-- Networking Stack (VPC)
+- Networking Stack (VPC) + Security Groups
 - AWS Cloud9 IDE
 - Amazon ECS Cluster (Fargate)
 - Amazon ECR container repository
-- Elastic Load Balancer
+- Elastic Load Balancer, Listener and Target Group
 
 ### Deploy the template ###
 
-Make sure you are logged into the AWS Console and right click on "Launch Stack" "Open in new Tab" below to automatically deploy the stack in the Frankfurt Region (eu-central-1):
+Make sure you are logged into the AWS Console and right click on "Launch Stack" + "Open in new Tab" below to automatically deploy the stack in the Frankfurt Region (eu-central-1):
 
 [![](images/cloudformation_launch_stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=roomreservation&templateURL=https:%2F%2Ffhnw-web-deployment.s3.eu-central-1.amazonaws.com%2Fenvironment_setup.yaml "Launch Stack")
 
@@ -131,7 +133,7 @@ You've successfully started your first Docker container on Amazon ECS!
 
 # Lab 2 #
 
-In Lab 1, you've created a task definition which describes the Docker container and it's parameters. You've then manually launched a container task from this task definition. An Amazon ECS service enables you to run and maintain a specified number of instances of a task definition simultaneously in an Amazon ECS cluster. If any of your tasks should fail or stop for any reason, the Amazon ECS service scheduler launches another instance of your task definition to replace it in order to maintain the desired number of tasks in the service.
+In Lab 1, you've created a task definition which describes the Docker container and it's parameters. You've manually launched a container task from the task definition. The goal if this lab is to make your deployment highly available behind a load balancer. An Amazon ECS service enables you to run and maintain a specified number of instances of a task definition simultaneously in an Amazon ECS cluster. If any of your tasks should fail or stop for any reason, the Amazon ECS service scheduler launches another instance of your task definition to replace it in order to maintain the desired number of tasks in the service.
 
 In addition to maintaining the desired number of tasks in your service, you can optionally run your service behind a load balancer. The load balancer distributes traffic across the tasks that are associated with the service.
 
