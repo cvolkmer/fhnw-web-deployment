@@ -23,7 +23,7 @@ Services deployed by the AWS CloudFormation template:
 
 ### Deploy the template ###
 
-Make sure you are logged into the AWS Console and click on "Launch Stack" below to automatically deploy the stack in the Frankfurt Region (eu-central-1):
+Make sure you are logged into the AWS Console and right click on "Launch Stack" "Open in new Tab" below to automatically deploy the stack in the Frankfurt Region (eu-central-1):
 
 [![](images/cloudformation_launch_stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=roomreservation&templateURL=https:%2F%2Ffhnw-web-deployment.s3.eu-central-1.amazonaws.com%2Fenvironment_setup.yaml "Launch Stack")
 
