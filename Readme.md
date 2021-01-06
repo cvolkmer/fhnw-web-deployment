@@ -12,27 +12,28 @@ You will need access to an AWS Account in order to conduct this lab. Either you'
 
 ## Prepare the environment ##
 
-We will be using a couple of AWS services for this lab. Please use [the AWS CloudFormation template](https://github.com/cvolkmer/fhnw-web-deployment/blob/master/infrastructure/environment_setup.yaml) to automatically setup the infrastructure needed. The template will setup most of the infrastructure components and you can concentrate on the container part. For this lab, we will be using the Frankfurt (eu-central-1) region. Please make sure you clone this repository to a local directory.
+We will be using a couple of AWS services for this lab. The base infrastructure setup is available as a CloudFormation template. If you are interested in what is deployed - the template is stored in this repository under "Infrastructure".
 
 Services deployed by the AWS CloudFormation template:
 - Networking Stack (VPC)
 - AWS Cloud9 IDE
 - Amazon ECS Cluster (Fargate)
 - Amazon ECR container repository
-- Elastic LoadBalancer
+- Elastic Load Balancer
 
 ### Deploy the template ###
-- In the AWS Console, select "Services" and type "CloudFormation"
-- On the right side in the AWS CloudFormation window, click on "Create stack" and select "With new resources (standard)"
-- Under "Specify template" select "Upload a template file" and click "Choose file"
-- Select the file "environment_setup.yaml" in the "infrastructure" directory of this repository and click "Next"
 
-![New Stack](images/cf_new_stack.png)
+Make sure you are logged into the AWS Console and click on "Launch Stack" below to automatically deploy the stack in the Frankfurt Region (eu-central-1):
 
-- Use "roomreservation" as "Stack name"
-- Leave the default values for the other parameters and click "Next"
-- On the "Configure Stack options" page scroll down and click "Next"
-- On the next page scroll down, select the checkbox under "Capabilities" and click "Create stack"
+[![](images/cloudformation_launch_stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=roomreservation&templateURL=https:%2F%2Ffhnw-web-deployment.s3.eu-central-1.amazonaws.com%2Fenvironment_setup.yaml "Launch Stack")
+
+- After clicking the link a new AWS Console window with CloudFormation will open
+    ![New Stack](images/cf_new_stack.png)  
+- In Step 1 "Specify template" leave the settings and click "Next"
+- In Step 2 "Specify stack details" leave the existing stack name "roomreservation" and click "Next"
+- In Step 3 "Configure stack options" scroll down and click "Next"
+- In Step 4 "Review" scroll down, check "I acknowledge that AWS CloudFormation might create IAM resources." and click "Next"
+    ![Review](images/cf_review.png)  
 - The Stack will be deployed automatically. This takes about 5 minutes. You can follow the creation process under "Events" and see the "Resources" deployed
 
 ### Access AWS Cloud9 IDE ###
@@ -51,9 +52,7 @@ AWS Cloud9 is fully managed IDE and provides the AWS SDK, AWS Cli and has Docker
 ```bash
 git clone https://github.com/cvolkmer/fhnw-web-deployment.git
 ```
-- You should now see the contents from the repository under the "Environments" section.
-
-    ![Repository content](images/cloud9_repository_content.png?v=4&s=10) 
+- You should now see the contents from the repository on the left side under the "Environments" section.
 
 ## Create and deploy your container ##
 
@@ -172,7 +171,7 @@ The target architecture will look like this:
 
 ## Check Application Status ##
 
-The Elastic LoadBalancer has been created already by the AWS CloudFormation script. You can now check the Load Balancer configuration and container status.
+The Elastic Load Balancer has been created already by the AWS CloudFormation script. You can now check the Load Balancer configuration and container status.
 
 - In the AWS Console, select "Services" and type "EC2"
 - Scroll down on the left navigation and click on "Target Groups"
@@ -189,4 +188,4 @@ The Elastic LoadBalancer has been created already by the AWS CloudFormation scri
    http://roomres-ALB-XXXXXXXXXXXX-XXXXXXXX.eu-central-1.elb.amazonaws.com
    ```
 
-Congraulations! You have launched your sample application hightly available behind an Elastic LoadBalancer on Amazon ECS!
+Congratulations! You have launched your sample application hightly available behind an Elastic Load Balancer on Amazon ECS!
