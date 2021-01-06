@@ -3,53 +3,53 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Description: This template deploys a set of AWS resources needed to run the FHNW web deployment lab.
 
-Parameters:
-  DBInstanceID:
-    Default: roomreservationInstance
-    Description: Roomreservation database instance
-    Type: String
-    MinLength: '1'
-    MaxLength: '63'
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: >-
-      Must begin with a letter and must not end with a hyphen or contain two
-      consecutive hyphens.
-  DBName:
-    Default: roomreservation
-    Description: My database
-    Type: String
-    MinLength: '1'
-    MaxLength: '64'
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
-  DBInstanceClass:
-    Default: db.t3.micro
-    Description: DB instance class
-    Type: String
-    ConstraintDescription: Must select a valid DB instance type.
-  DBAllocatedStorage:
-    Default: '10'
-    Description: The size of the database (GiB)
-    Type: Number
-    MinValue: '5'
-    MaxValue: '1024'
-    ConstraintDescription: must be between 20 and 65536 GiB.
-  DBUsername:
-    NoEcho: 'true'
-    Description: Username for MySQL database access
-    Type: String
-    MinLength: '1'
-    MaxLength: '16'
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBPassword:
-    NoEcho: 'true'
-    Description: Password MySQL database access
-    Type: String
-    MinLength: '8'
-    MaxLength: '41'
-    AllowedPattern: '[a-zA-Z0-9]*'
-    ConstraintDescription: must contain only alphanumeric characters.
+#Parameters:
+#  DBInstanceID:
+#    Default: roomreservationInstance
+#    Description: Roomreservation database instance
+#    Type: String
+#    MinLength: '1'
+#    MaxLength: '63'
+#    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+#    ConstraintDescription: >-
+#      Must begin with a letter and must not end with a hyphen or contain two
+#      consecutive hyphens.
+#  DBName:
+#    Default: roomreservation
+#    Description: My database
+#    Type: String
+#    MinLength: '1'
+#    MaxLength: '64'
+#    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+#    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
+#  DBInstanceClass:
+#    Default: db.t3.micro
+#    Description: DB instance class
+#    Type: String
+#    ConstraintDescription: Must select a valid DB instance type.
+#  DBAllocatedStorage:
+#    Default: '10'
+#    Description: The size of the database (GiB)
+#    Type: Number
+#    MinValue: '5'
+#    MaxValue: '1024'
+#    ConstraintDescription: must be between 20 and 65536 GiB.
+#  DBUsername:
+#    NoEcho: 'true'
+#    Description: Username for MySQL database access
+#    Type: String
+#    MinLength: '1'
+#    MaxLength: '16'
+#    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+#    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+#  DBPassword:
+#    NoEcho: 'true'
+#    Description: Password MySQL database access
+#    Type: String
+#    MinLength: '8'
+#    MaxLength: '41'
+#    AllowedPattern: '[a-zA-Z0-9]*'
+#    ConstraintDescription: must contain only alphanumeric characters.
 
 #  vpccidr:
 #    Type: String
@@ -302,6 +302,21 @@ Resources:
           Value: ECS-SG
       VpcId: !Ref VPC
 
+  TASKSG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupName: Roomreservation-TASK-SG
+      GroupDescription: Allow HTTP on 8080 from anywhere
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: TASK-SG
+      VpcId: !Ref VPC
+
   ###############################################################
   ### ECS
 
@@ -364,48 +379,66 @@ Resources:
     Type: "AWS::ElasticLoadBalancingV2::Listener"
     Properties:
       DefaultActions:
-        # -
-        #   TargetGroupArn: !Ref TargetGroup
-        #   Type: forward
-        - Type: fixed-response
-          FixedResponseConfig:
-            ContentType: "text/plain"
-            MessageBody: "You've reached the listener! Congrats!"
-            StatusCode: "503"
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+#        - Type: fixed-response
+#          FixedResponseConfig:
+#            ContentType: "text/plain"
+#            MessageBody: "You've reached the listener! Congrats!"
+#            StatusCode: "503"
       LoadBalancerArn: !Ref ALB
       Port: 80
       Protocol: HTTP
 
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      VpcId: !Ref VPC
+      Name: ecs-roomreservation-service
+      Port: 8080
+      Protocol: HTTP
+      TargetType: ip
+      HealthCheckIntervalSeconds: 60
+      HealthCheckPath: /
+      HealthCheckPort: 8080
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      Matcher: 
+        HttpCode: 200
+
+
   ###############################################################
   ### RDS
 
-  MyDB:
-    Type: 'AWS::RDS::DBInstance'
-    Properties:
-      DBInstanceIdentifier: !Ref DBInstanceID
-      DBName: !Ref DBName
-      DBInstanceClass: !Ref DBInstanceClass
-      AllocatedStorage: !Ref DBAllocatedStorage
-      Engine: MySQL
-      EngineVersion: 8.0.16
-      MasterUsername: !Ref DBUsername
-      MasterUserPassword: !Ref DBPassword
-      PubliclyAccessible: false
-      DBSubnetGroupName: !Ref MyDBSubnetGroup
+#  MyDB:
+#    Type: 'AWS::RDS::DBInstance'
+#    Properties:
+#      DBInstanceIdentifier: !Ref DBInstanceID
+#      DBName: !Ref DBName
+#      DBInstanceClass: !Ref DBInstanceClass
+#      AllocatedStorage: !Ref DBAllocatedStorage
+#      Engine: MySQL
+#      EngineVersion: 8.0.16
+#      MasterUsername: !Ref DBUsername
+#      MasterUserPassword: !Ref DBPassword
+#      PubliclyAccessible: false
+#      DBSubnetGroupName: !Ref MyDBSubnetGroup
 
-  MyDBSubnetGroup: 
-    Type: "AWS::RDS::DBSubnetGroup"
-    Properties: 
-      DBSubnetGroupDescription: DB Subnet group for FHNW roomreservation
-      SubnetIds: 
-        - !Ref SubnetPrivateA
-        - !Ref SubnetPrivateB
+#  MyDBSubnetGroup: 
+#    Type: "AWS::RDS::DBSubnetGroup"
+#    Properties: 
+#      DBSubnetGroupDescription: DB Subnet group for FHNW roomreservation
+#      SubnetIds: 
+#        - !Ref SubnetPrivateA
+#        - !Ref SubnetPrivateB
 
-  MyDBSecurityGroup:
-    Type: AWS::RDS::DBSecurityGroupIngress
-    Properties:
-      CIDRIP: 172.100.0.0/16
-      DBSecurityGroupName: Roomreservation-RDS-SG
+#  MyDBSecurityGroup:
+#    Type: AWS::RDS::DBSecurityGroupIngress
+#    Properties:
+#      CIDRIP: 172.100.0.0/16
+#      DBSecurityGroupName: Roomreservation-RDS-SG
     
   ###############################################################
   ### IAM

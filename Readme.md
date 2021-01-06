@@ -1,117 +1,192 @@
 # Introduction #
 
-In this lab you will deploy a sample Java application based on Amazon ECS Fargate container solution. You will be guided through the all the steps needed.
+This workshop is part of the WebDeployment lecture and considered a hands-on practical example, how deploy a sample Java application based on Amazon ECS Fargate container solution. It consists of 2 Lab sections and you will be guided through the all the steps needed.
+# Lab 1 #
 
-# Login to the AWS Console #
+This is the basic hands-on lab which should be run as part of the lecture. The target architecture looks like this.
+
+![Lab 1 Architecture](images/architecture_lab1.png)
+## Login to the AWS Console ##
 
 You will need access to an AWS Account in order to conduct this lab. Either you're having an existing one, or you will be given access to an AWS environment.
 
-# Prepare the environment #
+## Prepare the environment ##
 
-We will be using a couple of AWS services for this lab. Please use [the CloudFormation template](https://github.com/cvolkmer/fhnw-web-deployment/blob/master/infrastructure/environment_setup.yaml) to automatically setup the infrastructure needed. The template will setup most of the infrastructure components and you can concentrate on the container part. For this lab, we will be using the Frankfurt (eu-central-1) region. Please make sure you clone this repository to a local directory.
+We will be using a couple of AWS services for this lab. Please use [the AWS CloudFormation template](https://github.com/cvolkmer/fhnw-web-deployment/blob/master/infrastructure/environment_setup.yaml) to automatically setup the infrastructure needed. The template will setup most of the infrastructure components and you can concentrate on the container part. For this lab, we will be using the Frankfurt (eu-central-1) region. Please make sure you clone this repository to a local directory.
 
-Services deployed by the CloudFormation template:
-- Cloud9 IDE
-- ECS Cluster (Fargate)
-- ECR container repository
-- RDS MySQL
-- Application LoadBalancer (ELB)
+Services deployed by the AWS CloudFormation template:
+- Networking Stack (VPC)
+- AWS Cloud9 IDE
+- Amazon ECS Cluster (Fargate)
+- Amazon ECR container repository
+- Elastic LoadBalancer
 
-## Deploy the template ##
+### Deploy the template ###
 - In the AWS Console, select "Services" and type "CloudFormation"
-- On the right side in the CloudFormation window, click on "Create stack" and select "With new resources (standard)"
+- On the right side in the AWS CloudFormation window, click on "Create stack" and select "With new resources (standard)"
 - Under "Specify template" select "Upload a template file" and click "Choose file"
 - Select the file "environment_setup.yaml" in the "infrastructure" directory of this repository and click "Next"
-
 
 ![New Stack](images/cf_new_stack.png)
 
 - Use "roomreservation" as "Stack name"
-- Leave the default values for the other parameters
-
-
-![Stack Details](images/cf_stack_details.png)
-
-- Provide and note down a DBUsername and DBPassword parameter and click "Next"
+- Leave the default values for the other parameters and click "Next"
 - On the "Configure Stack options" page scroll down and click "Next"
 - On the next page scroll down, select the checkbox under "Capabilities" and click "Create stack"
+- The Stack will be deployed automatically. This takes about 5 minutes. You can follow the creation process under "Events" and see the "Resources" deployed
 
-
-![Create Stack](images/cf_new_stack.png)
-
-- The Stack will be deployed automatically. This takes about 10 minutes. You can follow the creation process under "Events" and see the "Resources" deployed
-
-## Access Cloud9 IDE ##
-Cloud9 is fully managed IDE and provides the AWS SDK, AWS Cli and has Docker pre-installed. 
+### Access AWS Cloud9 IDE ###
+AWS Cloud9 is fully managed IDE and provides the AWS SDK, AWS Cli and has Docker pre-installed. 
 - In the AWS Console select "Services" and type "Cloud9"
 - Click "Open IDE" on your instance. This will open a new window in your Browser and show the Cloud9 GUI
 
 ![Open Environment](images/cloud9_environments.png?v=4&s=10) 
  
-## Clone Repository ##
+### Clone Repository ###
 - Select the terminal window and make sure you're in the folling directory:
 ```bash
 <some_name>:~/environment $ 
 ```
 - Paste the following command to the terminal window:
-```bash 
+```bash
 git clone https://github.com/cvolkmer/fhnw-web-deployment.git
 ```
+- You should now see the contents from the repository under the "Environments" section.
 
-# Create and deploy your container #
+    ![Repository content](images/cloud9_repository_content.png?v=4&s=10) 
 
-## Explore ECR ##
-- Open a seaparate Browser tab (clone an existing one)
+## Create and deploy your container ##
+
+### Explore Amazon ECR ###
+- Open a seaparate Browser tab (clone an existing tab)
 - In the AWS Console select "Services" and type "Elastic Container Registry"
 - Click on the existing registry and open it
 
-![Open ECR registry](images/ecr_repositories.png)
+![Open Amazon ECR registry](images/ecr_repositories.png)
 
 - Make sure there is no image in the registry
 - Click on "View push commands" to get the instructions needed for the next steps.
 
 ![ECR push commands](images/ecr_push_commands.png)
 
-## Build your image ##
+### Build your image ###
 - Go back to your Cloud9 browser window
-- Navigate into the following directory containing the Dockerfile + the .war-File of your application
+- In the terminal window, navigate into the following directory containing the Dockerfile + the .war-File of your application
 ```bash
 cd fhnw-web-deployment/container/
 ```
-- Follow the push commands from ECR and copy / paste them to the terminal window
-- First, you will obtain temporary login credentials
-- Then you will build your container image locally in Cloud9
-- After that you will tag the image and
-- Upload (push) it to the ECR registry
+- Follow the push commands (steps 1-4) from ECR and copy / paste them to the terminal window in Cloud9
+  - First, you will obtain temporary login credentials
+  - Then you will build your container image locally in Cloud9
+  - After that you will tag the image and
+  - Upload (push) it to the ECR registry
+- You can close the push commands instructions by clicking "Close"
+- If you go back to the container registry, should see one image with the tag "latest"
 
-## Create a new task definition ##
 
-- Go back to your browser tab where you have ECR open
-- Close the push instructions and click on "Task Definitions" in the left navigation pane
+### Create a new task definition ###
+
+A task definition is required to run Docker containers in Amazon ECS. For example, you specify parameters like the Docker image to be used, CPU and Memory, Networking mode, Logging and more.
+
+- In the left navigation pane under "Amazon ECS" click on "Task Definitions" 
 - Click on "Create a new Task Definition"
-- Select "Fargate" in the launch type compatibility screen an click "Next step"
-- In the task and Container Definitions page provide the following inputs
-- As the task definition name enter "roomreservation"
-- Select the task role which begins with "roomreservsation-...."
-- In the "Task execution IAM role" select "ecsTaskExecutionRole" or "Create new"
-- Under "Task size" select "2GB" task memory + "1 vCPU"
-- In the Container Definitions click on "Add container"
-- Provide "roomreservation" as your container name
-- Copy the ECR URI to your container image into the "Image" section
-- Enter port "8080" in the port mappings section
-- Leave all other sections and click on "Create"
-- Back in the creation of the task definition screen make sure to deselect "Enable App-Mesh integration", "Enable proxy configuration" and "Enable FireLens integration"
-- Click "Create" to proceed and create the new task definition
+- Select "Fargate" in the launch type compatibility screen and click "Next step"
+- In the task and Container Definitions page provide the following inputs:
+  - As the "Task Definition Name" enter "roomreservation"
+  - Select "None" in the "Task Role"
+  - In the "Task execution IAM role" select "roomreservation-ECSTaskExe......" or "Create new" (validate)
+  - Under "Task size" select "2GB" task memory and "1 vCPU"
+  - In the "Container Definitions" click on "Add container"
+  - Enter "roomreservation" under "Container Name"
+  - Copy the ECR URI to your container image into the "Image" section. You can obtain it from your Cloud9 terminal. It looks like this: 
+    ```
+    123456789012.dkr.ecr.eu-central-1.amazonaws.com/roomreservation:latest
+    ```
+  - Enter port "8080" in the "Port mappings" section
+  - Leave all other sections and click "Add"
+  - Back in the task definition screen make sure to deselect "Enable App-Mesh integration", "Enable proxy configuration" and "Enable FireLens integration"
+  - Click "Create" and "View task definition" to proceed and create the new task definition
 
-## Run the task ##
+Congratulations, you have successfully created a new task definition. In the next step you will run a Docker container from the task definition you've created.
 
+### Run the task ###
 
+You will manually run a single Docker container. In production, you would create a Service (see Lab 2) to automatically run, scale and make your containers highly available.
+
+- Click on "Task Definitions" under "Amazon ECS" in the left navigation pane
+- Highlight the "roomreservation" Task definition and click on "Actions" => "Run Task"
+- Under "Launch type" select "Fargate"
+- In the "Cluster VPC" section, select the "Roomreservation-VPC" VPC with CIDR 172.100.0.0/16
+- You can select any public subent, for example "Roomreservation-PublicA - eu-central-1a"
+- Under "Security groups" click "Edit"
+- In the following window, check "Select existing security group" and select the Security group named "Roomreservation-TASK-SG" and click "Save"
+- Leave all other options unchanged and click on "Run Task" at the bottom of the page
+- In "Cluster : Roomreservation-Cluster" under "Tasks" you will find a new task being provisioned. The status should change to "RUNNING" shortly.
+- Click on the Task name itself to open the task details
+- In the "Network" section copy the "Public IP" and enter the following URL in a new Browser tab to verify your application is running. It might take a short time until the application is started:
+   ```
+   http://<your_container_ip>:8080
+   ```
+  
+You've successfully started your first Docker container on Amazon ECS!
+
+# Lab 2 #
+
+In Lab 1, you've created a task definition which describes the Docker container and it's parameters. You've then manually launched a container task from this task definition. An Amazon ECS service enables you to run and maintain a specified number of instances of a task definition simultaneously in an Amazon ECS cluster. If any of your tasks should fail or stop for any reason, the Amazon ECS service scheduler launches another instance of your task definition to replace it in order to maintain the desired number of tasks in the service.
+
+In addition to maintaining the desired number of tasks in your service, you can optionally run your service behind a load balancer. The load balancer distributes traffic across the tasks that are associated with the service.
+
+The target architecture will look like this:
+
+![Lab 2 Architecture](images/architecture_lab2.png)
 ## Create a service ##
+- Navigate to the "Clusters" section of Amazon ECS
+- Click on "Roomreservation-Cluster"
+- In the "Service" tab click "Create"
+- As "Launch type" select "Fargate"
+- Make sure the "Task Definition" is "roomreservation" and the "Cluster" is "Roomreservation-Cluster"
+- Under "Service name" enter "roomreservation-service"
+- In "Number of tasks" enter 2
+  ![Step 1: Configure Service](images/ecs_service_step1.png)
+- Click on "Next step" at the bottom of the page
+- In the "Cluster VPC" section, select the "Roomreservation-VPC" VPC with CIDR 172.100.0.0/16
+- As "Subnets", select the 2 private Subnets called "Roomreservation-PrivateA" and "Roomreservation-PrivateB"
+- Set "Auto-assign public IP" to "Disabled"
+  ![Step 2: Configure Network](images/ecs_service_step2.png)
+- Under "Security groups" click "Edit" and select the "Roomreservation-ECS-SG"
+  ![Step 2: Configure Network / Security Group](images/ecs_service_step2_sg.png)
+- In the Load balancing section, select "Application Load Balancer" as "Load balancer type"
+- Set the "Health check grace period" to 30 seconds
+- Under "Load balancer name" check that "roomres-ALB-..." is selected
+  ![Step 2: Configure Network / Load Balancer](images/ecs_service_setep2_lb1.png)
+- Under "Container to load balance" make sure "roomreservation:8080:8080" is selected and click on "Add to load balancer"
+- In the "Production listener port" select "80:HTTP"
+- Under "Target group name" select "ecs-roomreservation-service"
+    ![Step 2: Configure Network / Load Balancer](images/ecs_service_setep2_lb2.png)
+- Click on "Next step"
+- In the "Service Auto Scaling" leave the default setting "Do not adjust the service’s desired count" and click "Next step"
+- Review the configuration and click "Create Service"
+- Make sure all configuration steps are successful (green) and click "View Service"
+- You should now see a new service and after a short time, 2 container instances should be up and running
+    ![Service Summary](images/ecs_service_summary.png)
 
+## Check Application Status ##
 
-## Important to remember##
-- Put container in PRIVATE subnet and assign the ALB to ECS security group
-- Define container with port 8080
-- Deploy container image to ALB with path "/roomreservation" and order "1"
-- Make sure the healthcheck goes to "/" and NOT to "/roomreservation"
-- In the ALB Target Group change the health check port form "80“ to "8080"
+The Elastic LoadBalancer has been created already by the AWS CloudFormation script. You can now check the Load Balancer configuration and container status.
+
+- In the AWS Console, select "Services" and type "EC2"
+- Scroll down on the left navigation and click on "Target Groups"
+- Open the target group called "ecs-roomreservation-service"
+- Click on "Targets" - you will see your 2 container instances which have been launched by the service definition. You can also observe their helath status and that they have been launched in different Availability Zones (AZ)
+      ![Load Balancer targets](images/ecs_service_lb_targets.png)
+- Scroll down on the left navigation and click on "Load Balancers"
+- In the "Description" field in the middle, you will find the "DNS name" like
+    ```
+    roomres-ALB-XXXXXXXXXXXX-XXXXXXXX.eu-central-1.elb.amazonaws.com
+    ```
+- Open a new Browser tab and enter the URL
+   ```
+   http://roomres-ALB-XXXXXXXXXXXX-XXXXXXXX.eu-central-1.elb.amazonaws.com
+   ```
+
+Congraulations! You have launched your sample application hightly available behind an Elastic LoadBalancer on Amazon ECS!
