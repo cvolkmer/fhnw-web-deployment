@@ -7,6 +7,8 @@ This is a basic hands-on lab which should be run as part of the lecture. First, 
 
 The architecture looks like this:
 
+<kbd><img src="images/architecture_lab1.png" /></kbd>
+
 ![Lab 1 Architecture](images/architecture_lab1.png)
 ## Login to the AWS Console ##
 
@@ -68,8 +70,6 @@ git clone https://github.com/cvolkmer/fhnw-web-deployment.git
 - Make sure there is no image in the registry
 - Click on "View push commands" to get the instructions needed for the next steps.
 
-![ECR push commands](images/ecr_push_commands.png)
-
 ### Build your image ###
 - Go back to your Cloud9 browser window
 - In the terminal window, navigate into the following directory containing the Dockerfile + the .war-File of your application
@@ -81,6 +81,9 @@ cd fhnw-web-deployment/container/
   - Then you will build your container image locally in Cloud9
   - After that you will tag the image and
   - Upload (push) it to the ECR registry
+
+    ![ECR push commands](images/ecr_push_commands.png)
+
 - You can close the push commands instructions by clicking "Close"
 - If you go back to the container registry, should see one image with the tag "latest"
 
@@ -95,7 +98,7 @@ A task definition is required to run Docker containers in Amazon ECS. For exampl
 - In the task and Container Definitions page provide the following inputs:
   - As the "Task Definition Name" enter "roomreservation"
   - Select "None" in the "Task Role"
-  - In the "Task execution IAM role" select "roomreservation-ECSTaskExe......" or "Create new" (validate)
+  - In the "Task execution IAM role" select "roomreservation-ECSTaskExe......"
   - Under "Task size" select "2GB" task memory and "1 vCPU"
   - In the "Container Definitions" click on "Add container"
   - Enter "roomreservation" under "Container Name"
@@ -122,7 +125,7 @@ You will manually run a single Docker container. In production, you would create
 - Under "Security groups" click "Edit"
 - In the following window, check "Select existing security group" and select the Security group named "Roomreservation-TASK-SG" and click "Save"
 - Leave all other options unchanged and click on "Run Task" at the bottom of the page
-- In "Cluster : Roomreservation-Cluster" under "Tasks" you will find a new task being provisioned. The status should change to "RUNNING" shortly.
+- In "Cluster : Roomreservation-Cluster" under "Tasks" you will find a new task being provisioned. The status should change from "PROVISIONING" to "RUNNING" shortly.
 - Click on the Task name itself to open the task details
 - In the "Network" section copy the "Public IP" and enter the following URL in a new Browser tab to verify your application is running. It might take a short time until the application is started:
    ```
@@ -152,12 +155,11 @@ The target architecture will look like this:
 - Click on "Next step" at the bottom of the page
 - In the "Cluster VPC" section, select the "Roomreservation-VPC" VPC with CIDR 172.100.0.0/16
 - As "Subnets", select the 2 private Subnets called "Roomreservation-PrivateA" and "Roomreservation-PrivateB"
-- Set "Auto-assign public IP" to "Disabled"
-  ![Step 2: Configure Network](images/ecs_service_step2.png)
 - Under "Security groups" click "Edit" and select the "Roomreservation-ECS-SG"
   ![Step 2: Configure Network / Security Group](images/ecs_service_step2_sg.png)
+- Set "Auto-assign public IP" to "Disabled"
+  ![Step 2: Configure Network](images/ecs_service_step2.png)
 - In the Load balancing section, select "Application Load Balancer" as "Load balancer type"
-- Set the "Health check grace period" to 30 seconds
 - Under "Load balancer name" check that "roomres-ALB-..." is selected
   ![Step 2: Configure Network / Load Balancer](images/ecs_service_setep2_lb1.png)
 - Under "Container to load balance" make sure "roomreservation:8080:8080" is selected and click on "Add to load balancer"
@@ -176,11 +178,11 @@ The target architecture will look like this:
 The Elastic Load Balancer has been created already by the AWS CloudFormation script. You can now check the Load Balancer configuration and container status.
 
 - In the AWS Console, select "Services" and type "EC2"
-- Scroll down on the left navigation and click on "Target Groups"
+- Scroll down to the "Load Balancing" section on the left navigation and click on "Target Groups"
 - Open the target group called "ecs-roomreservation-service"
-- Click on "Targets" - you will see your 2 container instances which have been launched by the service definition. You can also observe their helath status and that they have been launched in different Availability Zones (AZ)
+- Click on "Targets" - you will see your 2 container instances which have been launched by the service definition. You can also observe their helath status and that they have been launched in different Availability Zones (AZ). They should show up with status "healthy".
       ![Load Balancer targets](images/ecs_service_lb_targets.png)
-- Scroll down on the left navigation and click on "Load Balancers"
+- In the "Load Balancing" section on the left navigation, click on "Load Balancers"
 - In the "Description" field in the middle, you will find the "DNS name" like
     ```
     roomres-ALB-XXXXXXXXXXXX-XXXXXXXX.eu-central-1.elb.amazonaws.com
