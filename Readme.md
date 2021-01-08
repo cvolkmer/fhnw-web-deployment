@@ -103,7 +103,7 @@ A task definition is required to run Docker containers in Amazon ECS. For exampl
   - Under "Task size" select "2GB" task memory and "1 vCPU"
   - In the "Container Definitions" click on "Add container"
   - Enter "roomreservation" under "Container Name"
-  - Copy the ECR URI to your container image into the "Image" section. You can obtain it from your Cloud9 terminal (bash history). It URI looks like this and was used in the "docker push" command: 
+  - Copy the ECR URI to your container image into the "Image" section. You can obtain it from your Cloud9 terminal (bash history). The URI looks like this and was used in the "docker push" command: 
     ```
     123456789012.dkr.ecr.eu-central-1.amazonaws.com/roomreservation:latest
     ```
