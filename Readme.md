@@ -7,8 +7,6 @@ This is a basic hands-on lab which should be run as part of the lecture. First, 
 
 The architecture looks like this:
 
-<kbd><img src="images/architecture_lab1.png" /></kbd>
-
 ![Lab 1 Architecture](images/architecture_lab1.png)
 ## Login to the AWS Console ##
 
