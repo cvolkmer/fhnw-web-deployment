@@ -92,6 +92,7 @@ cd fhnw-web-deployment/container/
 
 A task definition is required to run Docker containers in Amazon ECS. For example, you specify parameters like the Docker image to be used, CPU and Memory, Networking mode, Logging and more.
 
+- In the AWS Console select "Services" and type "Elastic Container Service"
 - In the left navigation pane under "Amazon ECS" click on "Task Definitions" 
 - Click on "Create a new Task Definition"
 - Select "Fargate" in the launch type compatibility screen and click "Next step"
@@ -102,13 +103,13 @@ A task definition is required to run Docker containers in Amazon ECS. For exampl
   - Under "Task size" select "2GB" task memory and "1 vCPU"
   - In the "Container Definitions" click on "Add container"
   - Enter "roomreservation" under "Container Name"
-  - Copy the ECR URI to your container image into the "Image" section. You can obtain it from your Cloud9 terminal. It looks like this: 
+  - Copy the ECR URI to your container image into the "Image" section. You can obtain it from your Cloud9 terminal (bash history). It URI looks like this and was used in the "docker push" command: 
     ```
     123456789012.dkr.ecr.eu-central-1.amazonaws.com/roomreservation:latest
     ```
   - Enter port "8080" in the "Port mappings" section
   - Leave all other sections and click "Add"
-  - Back in the task definition screen make sure to deselect "Enable App-Mesh integration", "Enable proxy configuration" and "Enable FireLens integration"
+  - Back in the task definition screen make sure that "Enable App-Mesh integration", "Enable proxy configuration" and "Enable FireLens integration" are NOT selected
   - Click "Create" and "View task definition" to proceed and create the new task definition
 
 Congratulations, you have successfully created a new task definition. In the next step you will run a Docker container from the task definition you've created.
@@ -118,7 +119,7 @@ Congratulations, you have successfully created a new task definition. In the nex
 You will manually run a single Docker container. In production, you would create a Service (see Lab 2) to automatically run, scale and make your containers highly available.
 
 - Click on "Task Definitions" under "Amazon ECS" in the left navigation pane
-- Highlight the "roomreservation" Task definition and click on "Actions" => "Run Task"
+- Select the "roomreservation" Task definition and click on "Actions" => "Run Task"
 - Under "Launch type" select "Fargate"
 - In the "Cluster VPC" section, select the "Roomreservation-VPC" VPC with CIDR 172.100.0.0/16
 - You can select any public subent, for example "Roomreservation-PublicA - eu-central-1a"
